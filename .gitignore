@@ -1,0 +1,5 @@
+*.pdf
+dist/
+build
+*.DS_Store
+setup.py

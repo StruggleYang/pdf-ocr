@@ -46,7 +46,7 @@ class DirDialog(wx.Frame):
     def readPdf(self, file):
         company_keys = ['大地财产保险', '太平洋财产保险', '太平保险',
                         '中国人民财产保险', '平安保险', '天平保险', '紫金财产保险']
-        date_pt = r'(\d\d\d\d[-|\\|\/]\d{1,2}[-|\\|\/]\d{1,2})'
+        date_pt = r'签单日期[:|：]\s{0,}(\d\d\d\d[-|\\|\/]\d{1,2}[-|\\|\/]\d{1,2})'
         with pdfplumber.open(file) as pdf:
             time = ''  # 时间
             insurance_categories = ''  # 保险类别
@@ -64,6 +64,11 @@ class DirDialog(wx.Frame):
                     else:
                         insurance_categories = '商业'
                     tables = page.extract_table()
+                if not time:
+                    if '签单日期':
+                        date = re.findall(date_pt, all_content)
+                        if date:
+                            time = date[0]
                 if tables:
                     for item in tables:
                         valid = list(filter(lambda x: x != None, item))

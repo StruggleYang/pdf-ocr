@@ -5,6 +5,7 @@
 """
 
 import os
+import re
 import wx
 import pdfplumber
 
@@ -38,20 +39,60 @@ class DirDialog(wx.Frame):
                 for file in files:
                     if file.endswith('.pdf'):
                         file_path = '%s/%s' % (dlg.GetPath(), file)
-                        print(file_path)
                         self.readPdf(file_path)
 
         dlg.Destroy()
 
     def readPdf(self, file):
+        company_keys = ['大地财产保险', '太平洋财产保险', '太平保险',
+                        '中国人民财产保险', '平安保险', '天平保险', '紫金财产保险']
+        date_pt = r'(\d\d\d\d[-|\\|\/]\d{1,2}[-|\\|\/]\d{1,2})'
         with pdfplumber.open(file) as pdf:
+            time = ''  # 时间
+            insurance_categories = ''  # 保险类别
+            insurance_company = ''  # 保险公司
+            insurant = ''  # 客户｜被保险人
+            id_number = ''  # 证件号()
+            plate_number = ''  # 车牌号
+            insured_amount = 0  # 保险金额
+            print(file)
             for page in pdf.pages:
-                print('页数', page.page_number)
                 all_content = page.extract_text(x_tolerance=0, y_tolerance=0)
-                tables = page.extract_table()
+                if not insurance_categories:
+                    if '强制' in all_content:
+                        insurance_categories = '交强'
+                    else:
+                        insurance_categories = '商业'
+                    tables = page.extract_table()
                 if tables:
                     for item in tables:
-                        print(item)
+                        valid = list(filter(lambda x: x != None, item))
+                        for strs in valid:
+                            if not insurant:
+                                if '被保险人' in strs.replace('\n', ''):
+                                    if not '\n' in strs:
+                                        insurant = strs.replace('被保险人：', '')
+                                        if '被保险人' in insurant:
+                                            insurant = valid[1]
+                                    else:
+                                        names = list(filter(
+                                            lambda x: x != '被\n保\n险\n人' and x != '名 称', valid))
+                                        if names:
+                                            insurant = names[-1]
+                            if not insurance_company:
+                                for cm in company_keys:
+                                    if cm in strs:
+                                        insurance_company = cm
+                            if not time:
+                                if '签单日期' in strs.replace('\n', ''):
+                                    date = re.findall(date_pt, strs)
+                                    if date:
+                                        time = date[0]
+
+            print('签单时间', time)
+            print('客户', insurant)
+            print('公司名称', insurance_company)
+            print('保险类别', insurance_categories)
 
 
 ###############################################################################

@@ -103,7 +103,8 @@ class DirDialog(wx.Frame):
                 if tables:
                     for item in tables:
                         valid = list(filter(lambda x: x != None, item))
-                        for strs in valid:
+                        for index in range(len(valid)):
+                            strs = valid[index]
                             if not customer.insurant:
                                 if '被保险人' in strs.replace('\n', ''):
                                     if not '\n' in strs:
@@ -132,8 +133,10 @@ class DirDialog(wx.Frame):
                                 if id_number:
                                     customer.id_number = id_number[0][0]
                             if not customer.plate_number:
-                                if '号牌号码' in strs.replace('\n', ''):
+                                xxx = strs.replace('\n', '')
+                                if '号' in xxx and '牌' in xxx and '号' in xxx and '码' in xxx:
                                     print(valid)
+                                    print(xxx)
                                     if not '\n' in strs:
                                         customer.plate_number = strs.replace(
                                             '号牌号码：', '')

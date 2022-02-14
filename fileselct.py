@@ -67,7 +67,7 @@ class DirDialog(wx.Frame):
                             data['公司名称'].append(customer.insurance_company)
                             data['保险类别'].append(customer.insurance_categories)
                 print(data)
-                self.pd_toexcel(data, '统计.xlsx')
+                self.pd_toexcel(data, '%s/统计.xlsx' % dlg.GetPath())
 
         dlg.Destroy()
 
@@ -76,7 +76,7 @@ class DirDialog(wx.Frame):
         # 创建DataFrame
         df = pd.DataFrame(data)
         # 存表，去除原始索引列（0,1,2...）
-        df.to_excel(file_name, index=False)
+        df.to_excel(r'%s' % file_name, index=False)
 
     def readPdf(self, file):
         company_keys = ['大地财产保险', '太平洋财产保险', '太平保险',

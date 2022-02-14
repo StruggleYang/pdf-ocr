@@ -4,3 +4,5 @@ build
 *.DS_Store
 setup.py
 *.xlsx
+.venv
+.eggs

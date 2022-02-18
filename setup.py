@@ -27,7 +27,7 @@ if sys.platform == 'darwin':
         app=[mainscript],
         # Cross-platform applications generally expect sys.argv to
         # be used for opening files.
-        options=dict(py2app=dict(argv_emulation=True)),
+        options=dict(py2app=dict(argv_emulation=True,iconfile='source/appicon1.icns')),
     )
 elif sys.platform == 'win32':
     extra_options = dict(
@@ -37,6 +37,6 @@ elif sys.platform == 'win32':
 
 
 setup(
-    name="main",
+    name="保险单识别系统",
     **extra_options
 )

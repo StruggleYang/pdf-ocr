@@ -17,6 +17,11 @@ class Customer:
     jq_amount = 0  # 交强险
     business_amount = 0  # 商业险
     from_file = ''  # 来源文件
+    """
+    temp
+    """
+    insurance_categories = ''
+    insured_amount = 0
 
     def description(self):
         """
@@ -44,8 +49,8 @@ class Customer:
         """
         return float(self.accident_amount)+float(self.jq_amount)+float(self.business_amount)
 
-    def identity(self, insurant, id_number, plate_number):
+    def identity(self, id_number, plate_number):
         """
         判断是否为同一客户
         """
-        return insurant == self.insurant and id_number == self.id_number and plate_number == self.plate_number
+        return id_number == self.id_number and plate_number == self.plate_number

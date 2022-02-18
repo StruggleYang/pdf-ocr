@@ -6,3 +6,4 @@ build
 .venv
 .eggs
 __pycache__
+.idea

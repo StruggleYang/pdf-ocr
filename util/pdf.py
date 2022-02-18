@@ -87,7 +87,7 @@ def read_pdf(file, all_customer):
                         id_number_matchs = re.findall(
                             id_number_business_pt, strs)
                     if id_number_matchs:
-                        if id_number_matchs[0].isinstance(str) :
+                        if isinstance(id_number_matchs[0], str):
                             temp_customer.id_number = id_number_matchs[0]
                         else:
                             temp_customer.id_number = id_number_matchs[0][0]
@@ -182,7 +182,7 @@ def read_pdf(file, all_customer):
     match_customer = list(
         filter(lambda x: x.identity(temp_customer.id_number, temp_customer.plate_number), all_customer))
     customer = Customer()
-    #print(temp_customer.insurant, temp_customer.id_number, temp_customer.plate_number)
+    # print(temp_customer.insurant, temp_customer.id_number, temp_customer.plate_number)
     if match_customer:
         customer = match_customer[0]
         customer.from_file = '%s,%s' % (customer.from_file, file)

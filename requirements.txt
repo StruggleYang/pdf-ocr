@@ -4,5 +4,6 @@ pandas==1.3.5
 openpyxl==3.0.9
 #打包
 py2app;sys_platform == 'darwin'
-py2exe;sys_platform == 'win32'
+py2exe==0.11.1.0;sys_platform == 'win32'
+pywin32==303;sys_platform == 'win32'
 ez_setup

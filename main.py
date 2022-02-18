@@ -3,6 +3,7 @@
 """
   Created: 2014/8/26
 """
+import sys
 import wx
 from util.statistics import analyse_and_export
 from util.logging import logger
@@ -20,6 +21,12 @@ class DirDialog(wx.Frame):
         """Constructor"""
         f = wx.Frame.__init__(self, None, -1, u"❤️保险单识别统计程序-YM专用❤️",
                               size=wx.Size(800, 500))
+        if sys.platform == "win32":
+            import win32api
+            # set window icon,窗口左上角图标
+            exeName = win32api.GetModuleFileName(win32api.GetModuleHandle(None))
+            icon = wx.Icon(exeName, wx.BITMAP_TYPE_ICO)
+            self.SetIcon(icon)
         b = wx.Button(self, -1, u"选择需要解析的文件夹",
                       style=wx.ALIGN_CENTER)
         self.Bind(wx.EVT_BUTTON, self.OnButton, b)

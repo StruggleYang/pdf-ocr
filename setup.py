@@ -1,11 +1,14 @@
 import sys
 from setuptools import setup
+#from distutils.core import setup
+if sys.platform == 'win32':
+    import py2exe
+else:
+    import py2app
 
 """
  py2app/py2exe build script for main.
 
- Will automatically ensure that all build prerequisites are available
- via ez_setup
 
  Usage (Mac OS X):
      python setup.py py2app
@@ -13,7 +16,6 @@ from setuptools import setup
  Usage (Windows):
      python setup.py py2exe
  """
-
 
 mainscript = 'main.py'
 extra_options = dict(
@@ -32,7 +34,10 @@ if sys.platform == 'darwin':
 elif sys.platform == 'win32':
     extra_options = dict(
         setup_requires=['py2exe'],
-        app=[mainscript],
+        windows =[{ #windows 与 console有区别，console打包后的程序运行有终端控制台窗口弹出
+            "script": mainscript,                    ### Main Python script
+            "icon_resources": [(1, "source/appicon1.ico")]     ### Icon to embed into the PE file.
+        }],
     )
 
 

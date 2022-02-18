@@ -3,7 +3,6 @@
 """
   Created: 2014/8/26
 """
-from numpy import size
 import wx
 from util.statistics import analyse_and_export
 from util.logging import logger

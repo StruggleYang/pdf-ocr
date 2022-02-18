@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # coding:utf-8
-from cmath import log
 import re
 import pdfplumber
 from model.customer import Customer
@@ -174,10 +173,11 @@ def date_unify(strdate: str):
     时间统一
     """
     strdate = strdate.replace(' ', '').replace(' ', '')
-    strdate = strdate.replace('年', '-').replace('月', '-').replace('日', '')
-    strdate = strdate.replace('/', '-')
-    strdate = strdate.replace('\\', '-')
-    arr = strdate.split('-')
+    strdate = strdate.replace('年', '.').replace('月', '.').replace('日', '')
+    strdate = strdate.replace('/', '.')
+    strdate = strdate.replace('-', '.')
+    strdate = strdate.replace('\\', '.')
+    arr = strdate.split('.')
     if len(arr) == 3:
         year = arr[0]
         mon = arr[1]
@@ -186,5 +186,5 @@ def date_unify(strdate: str):
             mon = str('0%s' % mon)
         if (not '0' in mon) and int(day) < 10:
             day = str('0%s' % day)
-        strdate = '%s-%s-%s' % (year, mon, day)
+        strdate = '%s.%s.%s' % (year, mon, day)
     return strdate

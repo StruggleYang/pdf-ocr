@@ -18,6 +18,7 @@ else:
  """
 
 mainscript = 'main.py'
+name="保险单识别系统"
 extra_options = dict(
     # Normally unix-like platforms will use "setup.py install"
     # and install the main script as such
@@ -35,6 +36,7 @@ elif sys.platform == 'win32':
     extra_options = dict(
         setup_requires=['py2exe'],
         windows =[{ #windows 与 console有区别，console打包后的程序运行有终端控制台窗口弹出
+            "dest_base": name, # 打包后的名字
             "script": mainscript,                    ### Main Python script
             "icon_resources": [(1, "source/appicon1.ico")]     ### Icon to embed into the PE file.
         }],
@@ -42,6 +44,6 @@ elif sys.platform == 'win32':
 
 
 setup(
-    name="保险单识别系统",
+    name=name,
     **extra_options
 )

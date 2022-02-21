@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding:utf-8
-import logging
 import logging.handlers
-import datetime
 import os
 
 DATE_FORMAT = "%m-%d-%Y %H:%M:%S.%p"
@@ -12,7 +10,7 @@ logger = logging.getLogger('insurance.analysis')
 logger.setLevel(logging.DEBUG)
 user_path = os.path.expanduser('~')
 rf_handler = logging.handlers.TimedRotatingFileHandler(
-    '%s/insurance-analysis-all.log' % (user_path), when='midnight', interval=1, backupCount=7, atTime=datetime.time(0, 0, 0, 0))
+    '%s/insurance-analysis-all.log' % (user_path), when='midnight', interval=1, backupCount=7)
 rf_handler.setFormatter(logging.Formatter(
     "%(asctime)s - %(levelname)s - %(message)s"))
 

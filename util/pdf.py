@@ -3,7 +3,7 @@
 import re
 import pdfplumber
 from model.customer import Customer
-from util.logging import logger
+from util.log import logger
 
 company_keys = ["中国人民财产保险", "中国大地财产保险", "中华联合财产保险", "中国太平洋财产保险", "中国平安财产保险", "天安财产保险", "史带财产保险", "华安财产保险", "永安财产保险",
                 "太平财产保险", "亚太财产保险", "美亚财产保险", "东京海上日动火灾保险", "瑞再企商保险", "安达保险", "三井住友海上火灾保险", "三星财产保险", "中银保险", "安联财产保险",

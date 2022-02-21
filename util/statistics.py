@@ -7,6 +7,7 @@ import os
 import time
 from util.pdf import read_pdf
 from util.execl import pandas_toexcel
+from util.log import logger
 
 
 ###############################################################################
@@ -16,7 +17,9 @@ def analyse_and_export(select_path, append_text=''):
     """
     files = os.listdir(select_path)
     data = {'日期': [], '客户': [],
-            '车牌号': [], '销售': [], '渠道': [], '公司': [], '初登': [], '电话': [], '身份证号': [], '车架号': [], '发动机号': [], '车型': [], '保险到期': [], '驾意险': [], '交强': [], '商业': [], '合计': [], '佣金比例': [], '手续费': [], '实收': [], '返点': [], '利润总额': [], '结算': [], '来源文件': []}
+            '车牌号': [], '销售': [], '渠道': [], '公司': [], '初登': [], '电话': [], '身份证号': [], '车架号': [], '发动机号': [], '车型': [],
+            '保险到期': [], '驾意险': [], '交强': [], '商业': [], '合计': [], '佣金比例': [], '手续费': [], '实收': [], '返点': [], '利润总额': [],
+            '结算': [], '来源文件': []}
     all_customer = []
     for file in files:
         if file.endswith('.pdf'):
@@ -25,11 +28,16 @@ def analyse_and_export(select_path, append_text=''):
                 file_path, all_customer)
             all_customer = new_all_customer
             if successful:
-                append_text = '%s\n\n✅已解析完成：%s=>%s' % (
-                    append_text, file, description)
+                ok = '已解析完成：%s=>%s' % (
+                    file, description)
+                logger.info(ok)
+                append_text = '%s\n\n✅%s' % (
+                    append_text, ok)
             else:
-                append_text = '%s\n\n❌未解析到内容：%s=>%s' % (
-                    append_text, file, description)
+                err = '未解析到内容：%s=>%s' % (file, description)
+                logger.info(err)
+                append_text = '%s\n\n❌%s' % (
+                    append_text, err)
     for customer in all_customer:
         if customer.not_empty():
             data['日期'].append(customer.date)
@@ -57,13 +65,19 @@ def analyse_and_export(select_path, append_text=''):
             data['利润总额'].append('')
             data['结算'].append('未结')
             data['来源文件'].append(customer.from_file)
+    execl_path = None
     if all_customer:
         execl_path = '%s/%s保险单解析汇总.xlsx' % (select_path, time.strftime(
             "%Y-%m-%d-%H-%M-%S", time.localtime()))
         pandas_toexcel(data, execl_path)
-        append_text = '%s\n\n共解析出%d条记录，结果execl文件位于:%s' % (
-            append_text, len(all_customer), execl_path)
+        ok = '共解析出%d条记录，结果execl文件位于:%s' % (
+            len(all_customer), execl_path)
+        logger.info(ok)
+        append_text = '%s\n\n%s' % (
+            append_text, ok)
     else:
-        append_text = '%s\n\n本次没有解析到有效内容,请检查目录是否正确！！！' % (
-            append_text)
-    return append_text
+        err = '本次没有解析到有效内容,请检查目录是否正确！！！'
+        logger.error(err)
+        append_text = '%s\n\n%s' % (
+            append_text, err)
+    return (append_text, execl_path)

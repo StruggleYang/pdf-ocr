@@ -67,8 +67,8 @@ def analyse_and_export(select_path, append_text=''):
             data['来源文件'].append(customer.from_file)
     execl_path = None
     if all_customer:
-        execl_path = '%s/%s保险单解析汇总.xlsx' % (select_path, time.strftime(
-            "%Y-%m-%d-%H-%M-%S", time.localtime()))
+        execl_path = os.path.join(select_path, ('%s保险单解析汇总.xlsx' % time.strftime(
+            "%Y-%m-%d-%H-%M-%S", time.localtime())))
         pandas_toexcel(data, execl_path)
         ok = '共解析出%d条记录，结果execl文件位于:%s' % (
             len(all_customer), execl_path)

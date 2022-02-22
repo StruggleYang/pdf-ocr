@@ -23,7 +23,7 @@ def analyse_and_export(select_path, append_text=''):
     all_customer = []
     for file in files:
         if file.endswith('.pdf'):
-            file_path = '%s/%s' % (select_path, file)
+            file_path = os.path.join(select_path,file)
             (new_all_customer, successful, description) = read_pdf(
                 file_path, all_customer)
             all_customer = new_all_customer

@@ -36,6 +36,156 @@ first_date_pt = r'[\s|初次]+登记日期\s{0,}[:|：]\s{0,}(\d\d\d\d[年|,|\-|
 expire_date_pt = r'保险期间.*起至\s{0,}(\d{4}\s{0,}[年|,|\-|\\|\/]\s{0,}\d{1,2}\s{0,}[月|,|\-|\\|\/]\s{0,}\d{1,2}\s{0,}日).*'
 
 
+def get_insurant(keyword, keyword_full, rows, index):
+    """
+    获得被保险人
+    """
+    insurant = ''
+    if '被保险人' in keyword:
+        if not '\n' in keyword_full:
+            insurant = keyword_full.replace(
+                '被保险人：', '')
+            if '被保险人' in insurant:
+                if index + 1 < len(rows):
+                    insurant = rows[index + 1]
+        else:
+            names = list(filter(
+                lambda x: x != '被\n保\n险\n人' and x != '名 称', rows))
+            if names:
+                insurant = names[-1]
+    return insurant
+
+
+def get_insurance_company(keyword):
+    """
+    保险公司
+    """
+    insurance_company = ''
+    for cm in company_keys:
+        if cm in keyword:
+            insurance_company = cm
+    return insurance_company
+
+
+def get_date(keyword):
+    """
+    出保单的日期
+    """
+    date = ''
+    if '签单日期' in keyword:
+        date_matchs = re.findall(date_pt, keyword)
+        if date_matchs:
+            date = date_unify(date_matchs[0])
+    return date
+
+
+def get_id_number(keyword):
+    """
+    获取身份证
+    """
+    id_number = ''
+    id_number_matchs = re.findall(
+        id_number_18_pt, keyword)
+    if not id_number_matchs:
+        id_number_matchs = re.findall(
+            id_number_15_pt, keyword)
+    if not id_number_matchs:
+        id_number_matchs = re.findall(
+            id_number_business_pt, keyword)
+    if id_number_matchs:
+        if isinstance(id_number_matchs[0], str):
+            id_number = id_number_matchs[0]
+        else:
+            id_number = id_number_matchs[0][0]
+    return id_number
+
+
+def get_plate_number(keyword):
+    """
+    获取车牌号
+    """
+    plate_number = ''
+    plate_number_matchs = re.findall(
+        car_number_pt, keyword)
+    if plate_number_matchs:
+        plate_number = plate_number_matchs[0]
+    return plate_number
+
+
+def get_engine_number(keyword, rows, index):
+    """
+    发动机号
+    """
+    engine_number = ''
+    if '发动机号' in keyword:
+        engine_number_matchs = re.findall(
+            engine_number_pt, keyword)
+        if engine_number_matchs:
+            engine_number = engine_number_matchs[0]
+        elif index + 1 < len(rows):
+            engine_number = rows[index + 1]
+    return engine_number
+
+
+def get_chassis_number(keyword, rows, index):
+    """
+    车架号
+    """
+    chassis_number = ''
+    if '车架号' in keyword or '识别代码' in keyword:
+        chassis_number_matchs = re.findall(
+            chassis_number_pt, keyword)
+        if chassis_number_matchs:
+            chassis_number = chassis_number_matchs[0]
+        elif index + 1 < len(rows):
+            chassis_number = rows[index + 1]
+    return chassis_number
+
+
+def get_first_date(keyword, rows, index):
+    """
+    初次登记日期
+    """
+    first_date = None
+    if '登记日期' in keyword:
+        first_date_matchs = re.findall(
+            first_date_pt, keyword)
+        if first_date_matchs:
+            first_date = date_unify(
+                first_date_matchs[0])
+        elif index + 1 < len(rows):
+            first_date = date_unify(rows[index + 1])
+    return first_date
+
+
+def get_expire_date(keyword):
+    """
+    到期日期
+    """
+    expire_date = None
+    if '保险期间' in keyword:
+        expire_date_matchs = re.findall(
+            expire_date_pt, keyword)
+        if expire_date_matchs:
+            expire_date = date_unify(
+                expire_date_matchs[0])
+    return expire_date
+
+
+def get_insured_amount(keyword):
+    """
+    保险金额
+    """
+    insured_amount = 0
+    if '人民币大写' in keyword:
+        insured_amount_matchs = re.findall(
+            rmb_pt, keyword)
+        if insured_amount_matchs:
+            insured_amount = str(insured_amount_matchs[0]).replace(
+                ',', '')
+    return insured_amount
+
+
 def read_pdf(file, all_customer):
     temp_customer = Customer()
     temp_customer.insurance_categories = ''
@@ -51,90 +201,30 @@ def read_pdf(file, all_customer):
     temp_customer.insurance_company = ''
     description = ''
     try:
-        def file_extract(valid: list):
+        def file_extract(valid):
             for index in range(len(valid)):
                 strs = valid[index]
                 xxx = strs.replace('\n', '')
                 if not temp_customer.insurant:
-                    if '被保险人' in xxx:
-                        if not '\n' in strs:
-                            temp_customer.insurant = strs.replace(
-                                '被保险人：', '')
-                            if '被保险人' in temp_customer.insurant:
-                                if index + 1 < len(valid):
-                                    temp_customer.insurant = valid[index + 1]
-                        else:
-                            names = list(filter(
-                                lambda x: x != '被\n保\n险\n人' and x != '名 称', valid))
-                            if names:
-                                temp_customer.insurant = names[-1]
+                    temp_customer.insurant = get_insurant(xxx, strs, valid, index)
                 if not temp_customer.insurance_company:
-                    for cm in company_keys:
-                        if cm in strs:
-                            temp_customer.insurance_company = cm
+                    temp_customer.insurance_company = get_insurance_company(strs)
                 if not temp_customer.date:
-                    if '签单日期' in xxx:
-                        date_matchs = re.findall(date_pt, strs)
-                        if date_matchs:
-                            temp_customer.date = date_unify(date_matchs[0])
+                    temp_customer.date = get_date(strs)
                 if not temp_customer.id_number:
-                    id_number_matchs = re.findall(
-                        id_number_18_pt, strs)
-                    if not id_number_matchs:
-                        id_number_matchs = re.findall(
-                            id_number_15_pt, strs)
-                    if not id_number_matchs:
-                        id_number_matchs = re.findall(
-                            id_number_business_pt, strs)
-                    if id_number_matchs:
-                        if isinstance(id_number_matchs[0], str):
-                            temp_customer.id_number = id_number_matchs[0]
-                        else:
-                            temp_customer.id_number = id_number_matchs[0][0]
+                    temp_customer.id_number = get_id_number(strs)
                 if not temp_customer.plate_number:
-                    plate_number_matchs = re.findall(
-                        car_number_pt, xxx)
-                    if plate_number_matchs:
-                        temp_customer.plate_number = plate_number_matchs[0]
+                    temp_customer.plate_number = get_plate_number(strs)
                 if not temp_customer.engine_number:
-                    if '发动机号' in xxx:
-                        engine_number_matchs = re.findall(
-                            engine_number_pt, xxx)
-                        if engine_number_matchs:
-                            temp_customer.engine_number = engine_number_matchs[0]
-                        elif index + 1 < len(valid):
-                            temp_customer.engine_number = valid[index + 1]
+                    temp_customer.engine_number = get_engine_number(strs, valid, index)
                 if not temp_customer.chassis_number:
-                    if '车架号' in xxx or '识别代码' in xxx:
-                        chassis_number_matchs = re.findall(
-                            chassis_number_pt, xxx)
-                        if chassis_number_matchs:
-                            temp_customer.chassis_number = chassis_number_matchs[0]
-                        elif index + 1 < len(valid):
-                            temp_customer.chassis_number = valid[index + 1]
+                    temp_customer.chassis_number = get_chassis_number(strs, valid, index)
                 if not temp_customer.first_date:
-                    if '登记日期' in xxx:
-                        first_date_matchs = re.findall(
-                            first_date_pt, xxx)
-                        if first_date_matchs:
-                            temp_customer.first_date = date_unify(
-                                first_date_matchs[0])
-                        elif index + 1 < len(valid):
-                            temp_customer.first_date = date_unify(valid[index + 1])
+                    temp_customer.first_date = get_first_date(strs, valid, index)
                 if not temp_customer.expire_date:
-                    if '保险期间' in xxx:
-                        expire_date_matchs = re.findall(
-                            expire_date_pt, xxx)
-                        if expire_date_matchs:
-                            temp_customer.expire_date = date_unify(
-                                expire_date_matchs[0])
+                    temp_customer.expire_date = get_expire_date(strs)
                 if not temp_customer.insured_amount:
-                    if '人民币大写' in xxx:
-                        insured_amount_matchs = re.findall(
-                            rmb_pt, xxx)
-                        if insured_amount_matchs:
-                            temp_customer.insured_amount = str(insured_amount_matchs[0]).replace(
-                                ',', '')
+                    temp_customer.insured_amount = get_insured_amount(strs)
 
         with pdfplumber.open(file) as pdf:
             logger.info('开始解析文件:%s' % file)

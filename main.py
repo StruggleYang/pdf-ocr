@@ -16,6 +16,7 @@ from util.file import os_open_file
 class DirDialog(wx.Frame):
     files_names = None
     open_result = True
+    selected = False
     """"""
 
     # ----------------------------------------------------------------------
@@ -59,11 +60,15 @@ class DirDialog(wx.Frame):
         """
         文件按钮点击事件
         """
+        if self.selected:
+            wx.MessageBox("正在解析...等待解析结束后可选择",parent=self.scrollWin)
+            return
         dlg = wx.DirDialog(self, u"选择需要解析的文件夹", style=wx.DD_DEFAULT_STYLE)
         self.files_names.SetLabel('正在解析...(请勿关闭程序)')
         # 选择了文件夹
         if dlg.ShowModal() == wx.ID_OK:
             if dlg.GetPath():
+                self.selected = True
                 logger.info('已选文件夹:%s' % dlg.GetPath())
                 self.files_names.SetLabel('已选解析文件目录:%s' % dlg.GetPath())
                 # 主要的解析导出流出
@@ -78,6 +83,7 @@ class DirDialog(wx.Frame):
                 self.scrollWin.SetScrollbars(0, 1, 0, h + 60)
                 self.scrollWin.SetScrollRate(1, 1)  # Pixels per scroll increment
         elif dlg.ShowModal() == wx.ID_CANCEL:
+            self.selected = False
             self.files_names.LabelText = '已取消选择，请重新选择解析目录'
         dlg.Destroy()
 

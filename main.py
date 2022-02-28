@@ -23,9 +23,9 @@ class DirDialog(wx.Frame):
     def __init__(self):
         """Constructor"""
         self.fm = wx.Frame.__init__(self, None, -1, u"❤️保险单识别统计程序-YM专用❤️",
-                              size=wx.Size(800, 500))
+                                    size=wx.Size(800, 500))
         # 初始化滚动条
-        self.scrollWin = wx.ScrolledWindow(self, -1,size=wx.Size(800, 500))
+        self.scrollWin = wx.ScrolledWindow(self, -1, size=wx.Size(800, 500))
         # 设置windows 的窗口小图标和应用icon一致
         if sys.platform == "win32":
             import win32api
@@ -33,12 +33,12 @@ class DirDialog(wx.Frame):
             exeName = win32api.GetModuleFileName(win32api.GetModuleHandle(None))
             icon = wx.Icon(exeName, wx.BITMAP_TYPE_ICO)
             self.SetIcon(icon)
-        # 文件选择按钮
+        # 文件夹选择按钮
         b = wx.Button(self.scrollWin, -1, u"选择需要解析的文件夹",
                       style=wx.ALIGN_CENTER)
         self.Bind(wx.EVT_BUTTON, self.OnButton, b)
         # 是否自动开的复选框
-        self.cb1 = wx.CheckBox(self.scrollWin, label='解析后自动打开文件', pos=(180, 5))
+        self.cb1 = wx.CheckBox(self.scrollWin, label='自动打开解析结果excel', pos=(180, 5))
         self.cb1.SetValue(self.open_result)
         self.Bind(wx.EVT_CHECKBOX, self.onChecked)
 
@@ -61,9 +61,11 @@ class DirDialog(wx.Frame):
         文件按钮点击事件
         """
         if self.selected:
-            wx.MessageBox("正在解析...等待解析结束后可选择",parent=self.scrollWin)
+            wx.MessageBox("正在解析...等待解析结束后可选择", parent=self.scrollWin)
             return
-        dlg = wx.DirDialog(self, u"选择需要解析的文件夹", style=wx.DD_DEFAULT_STYLE)
+        style = wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE
+        dlg = wx.DirDialog(self, u"请选择需要解析的pdf文件夹", style=style)
+
         self.files_names.SetLabel('正在解析...(请勿关闭程序)')
         # 选择了文件夹
         if dlg.ShowModal() == wx.ID_OK:

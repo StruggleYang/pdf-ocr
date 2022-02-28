@@ -86,7 +86,7 @@ def analyse_and_export(select_path, append_text=''):
             for index in range(3):
                 link = ""
                 if index < len(files):
-                    text = str(files[index]).replace("\\\\", "@@").replace("/", "@@").split("@@")[-1]
+                    text = str(files[index]).replace("\\", "@@").replace("/", "@@").split("@@")[-1]
                     link = '=HYPERLINK("%s","%s")' % (files[index], text)
                 data['来源文件%d(单击打开)' % (index + 1)].append(link)
 

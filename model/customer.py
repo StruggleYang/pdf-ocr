@@ -11,8 +11,8 @@ class Customer:
     plate_number = ''  # 车牌号
     engine_number = ''  # 发动机号码
     chassis_number = ''  # 车架号
-    car_models = '' # 车型(厂牌型号)
-    tel = '' # 电话
+    car_models = ''  # 车型(厂牌型号)
+    tel = ''  # 电话
     first_date = ''  # 初次登记日期
     expire_date = ''  # 到期日期
     accident_amount = 0  # 意外险金额
@@ -31,8 +31,7 @@ class Customer:
         """
         des = '没有内容'
         if self.not_empty():
-            des = '%s/%s/%s...' % (self.insurant,
-                                   self.id_number, self.plate_number)
+            des = '%s/%s/%s...' % (self.insurant, self.plate_number, self.id_number)
 
         return des
 
@@ -41,7 +40,7 @@ class Customer:
         客户信息不是空的
         """
         yes = False
-        if self.insurant and self.id_number and self.plate_number:
+        if self.id_number:
             yes = True
         return yes
 
@@ -49,7 +48,7 @@ class Customer:
         """
         所有涉及的保险类别金额总计
         """
-        return float(self.accident_amount)+float(self.jq_amount)+float(self.business_amount)
+        return float(self.accident_amount) + float(self.jq_amount) + float(self.business_amount)
 
     def identity(self, id_number, plate_number):
         """

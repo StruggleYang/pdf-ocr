@@ -11,6 +11,7 @@ class Customer:
     plate_number = ''  # 车牌号
     engine_number = ''  # 发动机号码
     chassis_number = ''  # 车架号
+    car_models = '' # 车型(厂牌型号)
     first_date = ''  # 初次登记日期
     expire_date = ''  # 到期日期
     accident_amount = 0  # 意外险金额
@@ -52,5 +53,6 @@ class Customer:
     def identity(self, id_number, plate_number):
         """
         判断是否为同一客户
+        一些极端情况下，比如商业险是个人购买但为公司车辆，则不适用，因为证件号码可能一个为营业执照的号码，一个为身份证，此时要用车牌号
         """
         return id_number == self.id_number and plate_number == self.plate_number

@@ -38,7 +38,9 @@ def analyse_and_export(select_path, append_text=''):
                 logger.info(err)
                 append_text = '%s\n\n❌%s' % (
                     append_text, err)
-    for customer in all_customer:
+    # 按照时间排序
+    all_customer_sorted = sorted(all_customer,key = lambda e:e.date)
+    for customer in all_customer_sorted:
         if customer.not_empty():
             data['日期'].append(customer.date)
             data['客户'].append(customer.insurant)
@@ -52,7 +54,7 @@ def analyse_and_export(select_path, append_text=''):
             data['身份证号'].append(customer.id_number)
             data['车架号'].append(customer.chassis_number)
             data['发动机号'].append(customer.engine_number)
-            data['车型'].append('')
+            data['车型'].append(customer.car_models)
             data['保险到期'].append(customer.expire_date)
             data['驾意险'].append(customer.accident_amount)
             data['交强'].append(customer.jq_amount)

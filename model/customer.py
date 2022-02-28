@@ -12,6 +12,7 @@ class Customer:
     engine_number = ''  # 发动机号码
     chassis_number = ''  # 车架号
     car_models = '' # 车型(厂牌型号)
+    tel = '' # 电话
     first_date = ''  # 初次登记日期
     expire_date = ''  # 到期日期
     accident_amount = 0  # 意外险金额

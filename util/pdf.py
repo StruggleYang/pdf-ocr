@@ -24,7 +24,8 @@ match_keywords = {"客户": ["行驶证车主", "被保险人", "投保人名称
                   "车型": ["厂牌型号", "车型"],
                   "初登日期": ["初次", "首次", "登记日期"],
                   "保险过期": ["保险期间", "起至", "起止"],
-                  "保险金额": ["人民币大写", "保险费合计", "人民币", "大写", "CNY", "￥", "¥"]}
+                  "保险金额": ["人民币大写", "保险费合计", "人民币", "大写", "CNY", "￥", "¥"],
+                  "电话": ["被保险人电话", "联系电话"]}
 date_pt = r'签单日期\s{0,}[:|：]\s{0,}(\d{4}[年|,|\-|\\|\/]\d{1,2}[月|,|\-|\\|\/]\d{1,2})'
 id_number_18_pt = r'([1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx])'  # 身份证18位
 id_number_15_pt = r'([1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3})'  # 身份证15位
@@ -198,6 +199,25 @@ def get_car_models(keyword, rows, index):
     return car_models
 
 
+def get_tel(keyword, rows, index):
+    """
+    联系电话
+    """
+    tel = ''
+    for ckey in match_keywords["电话"]:
+        if ckey in remove_blank(keyword):
+            for spl in [":", "："]:
+                if spl in keyword:
+                    logger.info("识别到电话,关键字[%s]::%s" % (ckey, keyword))
+                    tel = keyword.split(spl)[1].strip().split(" ")[0]
+            if not tel:
+                if index + 1 < len(rows):
+                    tel = remove_newline(rows[index + 1])
+    if '****' not in tel:
+        tel = ''
+    return tel
+
+
 def get_first_date(keyword, rows, index):
     """
     初次登记日期
@@ -297,6 +317,8 @@ def read_pdf(file, all_customer):
                     temp_customer.expire_date = get_expire_date(strs)
                 if not temp_customer.insured_amount:
                     temp_customer.insured_amount = get_insured_amount(strs, temp_customer.insurance_categories)
+                if not temp_customer.tel:
+                    temp_customer.tel = get_tel(strs, valid, index)
 
         with pdfplumber.open(file) as pdf:
             logger.info('开始解析文件:%s' % file)
@@ -376,6 +398,8 @@ def read_pdf(file, all_customer):
         customer.first_date = temp_customer.first_date
     if not customer.expire_date:
         customer.expire_date = temp_customer.expire_date
+    if not customer.tel:
+        customer.tel = temp_customer.tel
     if not customer.not_empty():
         customer.insurant = temp_customer.insurant
         customer.id_number = temp_customer.id_number

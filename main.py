@@ -82,6 +82,7 @@ class DirDialog(wx.Frame):
                 # 滚动条
                 self.scrollWin.SetScrollbars(0, 1, 0, h + 60)
                 self.scrollWin.SetScrollRate(1, 1)  # Pixels per scroll increment
+                self.selected = False
         elif dlg.ShowModal() == wx.ID_CANCEL:
             self.selected = False
             self.files_names.LabelText = '已取消选择，请重新选择解析目录'

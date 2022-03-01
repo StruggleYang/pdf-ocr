@@ -2,9 +2,7 @@
 # coding:utf-8
 import logging.handlers
 import os
-import sys
 
-sys.stdout.reconfigure(encoding='utf-8')
 DATE_FORMAT = "%m-%d-%Y %H:%M:%S.%p"
 logging.basicConfig(datefmt=DATE_FORMAT)
 

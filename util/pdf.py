@@ -339,8 +339,12 @@ def read_pdf(file, all_customer, DEBUG=False):
                 if not temp_customer.tel:
                     temp_customer.tel = get_tel(strs, valid, index)
 
-        with pdfplumber.open(file) as pdf:
+        with pdfplumber.open(file, password="") as pdf:
             logger.info('开始解析文件:%s' % file)
+            with open(file, 'rb') as f:
+                import chardet
+                encoding = chardet.detect(f.read())
+                logger.info('文件编码信息:%s:%s' % (file, str(encoding)))
             page_content_cache = []
             for page in pdf.pages:
                 # 默认解析前5页
@@ -348,9 +352,10 @@ def read_pdf(file, all_customer, DEBUG=False):
                     break
                 all_content = page.extract_text(x_tolerance=0, y_tolerance=0)
                 if DEBUG:
-                    logger.info('DEBUG===========%s-page%d' %
-                                (file, page.page_number))
+                    logger.info('DEBUG===========%s-page%d,page object[%d]' %
+                                (file, page.page_number, len(page.objects)))
                     logger.info(all_content)
+                    logger.info(page.objects)
                 # 加入到缓存，做加强处理
                 page_content_cache.append(all_content)  # 这可能有问题
                 if not temp_customer.insurance_categories:

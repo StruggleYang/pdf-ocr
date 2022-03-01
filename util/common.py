@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding:utf-8
+# -*- coding: UTF-8 -*-
 from threading import Thread
 # 异步方法
 def async_method(fn):

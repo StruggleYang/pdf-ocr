@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding:utf-8
+# -*- coding: UTF-8 -*-
 class Customer:
     """
     客户信息

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# coding:utf-8
+# coding:utf-
+# -*- coding: UTF-8 -*-
 """
   Created: 2014/8/26
 """
@@ -11,7 +12,7 @@ from util.log import logger
 
 
 ###############################################################################
-def analyse_and_export(select_path, append_text=''):
+def analyse_and_export(select_path, append_text='', DEBUG=False):
     """
     分析和导出
     """
@@ -25,7 +26,7 @@ def analyse_and_export(select_path, append_text=''):
         if file.endswith('.pdf'):
             file_path = os.path.join(select_path, file)
             (new_all_customer, successful, description) = read_pdf(
-                file_path, all_customer)
+                file_path, all_customer, DEBUG=DEBUG)
             all_customer = new_all_customer
             if successful:
                 ok = '已解析完成：%s=>%s' % (
@@ -86,7 +87,8 @@ def analyse_and_export(select_path, append_text=''):
             for index in range(3):
                 link = ""
                 if index < len(files):
-                    text = str(files[index]).replace("\\", "@@").replace("/", "@@").split("@@")[-1]
+                    text = str(files[index]).replace(
+                        "\\", "@@").replace("/", "@@").split("@@")[-1]
                     link = '=HYPERLINK("%s","%s")' % (files[index], text)
                 data['来源文件%d(单击打开)' % (index + 1)].append(link)
 

@@ -17,6 +17,7 @@ class DirDialog(wx.Frame):
     files_names = None
     open_result = True
     selected = False
+    DEBUG = False
     """"""
 
     # ----------------------------------------------------------------------
@@ -30,7 +31,8 @@ class DirDialog(wx.Frame):
         if sys.platform == "win32":
             import win32api
             # set window icon,窗口左上角图标
-            exeName = win32api.GetModuleFileName(win32api.GetModuleHandle(None))
+            exeName = win32api.GetModuleFileName(
+                win32api.GetModuleHandle(None))
             icon = wx.Icon(exeName, wx.BITMAP_TYPE_ICO)
             self.SetIcon(icon)
         # 文件夹选择按钮
@@ -38,15 +40,29 @@ class DirDialog(wx.Frame):
                       style=wx.ALIGN_CENTER)
         self.Bind(wx.EVT_BUTTON, self.OnButton, b)
         # 是否自动开的复选框
-        self.cb1 = wx.CheckBox(self.scrollWin, label='自动打开解析结果excel', pos=(180, 5))
+        self.cb1 = wx.CheckBox(
+            self.scrollWin, label='自动打开解析结果excel', pos=(180, 5))
         self.cb1.SetValue(self.open_result)
         self.Bind(wx.EVT_CHECKBOX, self.onChecked)
+        # 是否自动开的复选框
+        self.cb2 = wx.CheckBox(
+            self.scrollWin, label='调试模式', pos=(350, 5))
+        self.cb2.SetValue(self.DEBUG)
+        self.Bind(wx.EVT_CHECKBOX, self.debugOnChecked)
 
         # 提示文本
         self.files_names = wx.StaticText(
             self.scrollWin, label="暂未选择文件！！！", pos=(10, 40), style=wx.ALIGN_LEFT)
         # 窗口居中
         self.Center()
+
+    def debugOnChecked(self, e):
+        """
+        调试模式
+        """
+        cb = e.GetEventObject()
+        self.DEBUG = cb.GetValue()
+        print(self.DEBUG)
 
     def onChecked(self, e):
         """
@@ -75,7 +91,7 @@ class DirDialog(wx.Frame):
                 self.files_names.SetLabel('已选解析文件目录:%s' % dlg.GetPath())
                 # 主要的解析导出流出
                 (label_text, export_path) = analyse_and_export(
-                    dlg.GetPath(), self.files_names.LabelText)
+                    dlg.GetPath(), self.files_names.LabelText, self.DEBUG)
                 self.files_names.LabelText = label_text
                 if export_path and self.open_result:
                     os_open_file(export_path)
@@ -83,7 +99,8 @@ class DirDialog(wx.Frame):
                 w, h = self.files_names.GetSize()
                 # 滚动条
                 self.scrollWin.SetScrollbars(0, 1, 0, h + 60)
-                self.scrollWin.SetScrollRate(1, 1)  # Pixels per scroll increment
+                # Pixels per scroll increment
+                self.scrollWin.SetScrollRate(1, 1)
                 self.selected = False
         elif dlg.ShowModal() == wx.ID_CANCEL:
             self.selected = False

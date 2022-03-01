@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding:utf-8
+# -*- coding: UTF-8 -*-
 import re
 import pdfplumber
 from model.customer import Customer
@@ -27,9 +28,12 @@ match_keywords = {"客户": ["行驶证车主", "被保险人", "投保人姓名
                   "保险金额": ["人民币大写", "保险费合计", "总保险费", "人民币", "大写", "CNY", "￥", "¥"],
                   "电话": ["被保险人电话", "联系电话"]}
 date_pt = r'签单日期\s{0,}[:|：]\s{0,}(\d{4}[年|,|\-|\\|\/]\d{1,2}[月|,|\-|\\|\/]\d{1,2})'
-id_number_18_pt = r'([1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx])'  # 身份证18位
-id_number_15_pt = r'([1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3})'  # 身份证15位
-id_number_business_pt = r'([1-9ANY^IOZSV][1-9A-Z^IOZSV]\d{6}[0-9A-Z^IOZSV]{9}[0-9A-Z^IOZSV])'  # 营业执照，统一社会信用代码
+# 身份证18位
+id_number_18_pt = r'([1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx])'
+# 身份证15位
+id_number_15_pt = r'([1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3})'
+# 营业执照，统一社会信用代码
+id_number_business_pt = r'([1-9ANY^IOZSV][1-9A-Z^IOZSV]\d{6}[0-9A-Z^IOZSV]{9}[0-9A-Z^IOZSV])'
 car_number_pt = r'([京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1})'
 rmb_pt = r"[￥|¥]\s*[\u00a0]{0,}[:|：]\s*[\u00a0]{0,}[RMB]{0,}([0-9,\.\s[\u00a0]]*)\s*元"
 rmb_pt_old = r'[￥|¥]?\s*[:|：]?\s*[￥|¥]?[RMB]{0,}[CNY]{0,}\s*([0-9,\.]+)\s*[元]?'
@@ -67,7 +71,8 @@ def get_insurant(keyword, keyword_full, rows, index):
             if mkey in keyword_full:
                 for spl in [":", "："]:
                     if spl in keyword_full:
-                        logger.info("识别到被保险人,关键字[%s]::%s" % (mkey, keyword_full))
+                        logger.info("识别到被保险人,关键字[%s]::%s" %
+                                    (mkey, keyword_full))
                         insurant = remove_blank(keyword_full.split(spl)[1])
     for mkey in match_keywords['客户']:
         insurant = insurant.replace(mkey, '')
@@ -283,7 +288,7 @@ def get_insured_amount(keyword, insurance_categories):
     return insured_amount
 
 
-def read_pdf(file, all_customer):
+def read_pdf(file, all_customer, DEBUG=False):
     temp_customer = Customer()
     temp_customer.insurance_categories = ''
     temp_customer.insured_amount = 0
@@ -303,9 +308,11 @@ def read_pdf(file, all_customer):
                 strs = valid[index]
                 xxx = strs.replace('\n', '')
                 if not temp_customer.insurant:
-                    temp_customer.insurant = get_insurant(xxx, strs, valid, index)
+                    temp_customer.insurant = get_insurant(
+                        xxx, strs, valid, index)
                 if not temp_customer.insurance_company:
-                    temp_customer.insurance_company = get_insurance_company(strs)
+                    temp_customer.insurance_company = get_insurance_company(
+                        strs)
                 if not temp_customer.date:
                     temp_customer.date = get_date(strs)
                 if not temp_customer.id_number:
@@ -313,17 +320,22 @@ def read_pdf(file, all_customer):
                 if not temp_customer.plate_number:
                     temp_customer.plate_number = get_plate_number(strs)
                 if not temp_customer.engine_number:
-                    temp_customer.engine_number = get_engine_number(strs, valid, index)
+                    temp_customer.engine_number = get_engine_number(
+                        strs, valid, index)
                 if not temp_customer.chassis_number:
-                    temp_customer.chassis_number = get_chassis_number(strs, valid, index)
+                    temp_customer.chassis_number = get_chassis_number(
+                        strs, valid, index)
                 if not temp_customer.car_models:
-                    temp_customer.car_models = get_car_models(strs, valid, index)
+                    temp_customer.car_models = get_car_models(
+                        strs, valid, index)
                 if not temp_customer.first_date:
-                    temp_customer.first_date = get_first_date(strs, valid, index)
+                    temp_customer.first_date = get_first_date(
+                        strs, valid, index)
                 if not temp_customer.expire_date:
                     temp_customer.expire_date = get_expire_date(strs)
                 if not temp_customer.insured_amount:
-                    temp_customer.insured_amount = get_insured_amount(strs, temp_customer.insurance_categories)
+                    temp_customer.insured_amount = get_insured_amount(
+                        strs, temp_customer.insurance_categories)
                 if not temp_customer.tel:
                     temp_customer.tel = get_tel(strs, valid, index)
 
@@ -335,6 +347,10 @@ def read_pdf(file, all_customer):
                 if page.page_number > 5:
                     break
                 all_content = page.extract_text(x_tolerance=0, y_tolerance=0)
+                if DEBUG:
+                    logger.info('DEBUG===========%s-page%d' %
+                                (file, page.page_number))
+                    logger.info(all_content)
                 # 加入到缓存，做加强处理
                 page_content_cache.append(all_content)  # 这可能有问题
                 if not temp_customer.insurance_categories:
@@ -364,7 +380,8 @@ def read_pdf(file, all_customer):
                     all_match_keywords = []
                     for field, keywords in match_keywords.items():
                         all_match_keywords.extend(keywords)
-                    match_rows = list(filter(lambda x: any(map(lambda y: y in x, all_match_keywords)), all_content_arr))
+                    match_rows = list(filter(lambda x: any(
+                        map(lambda y: y in x, all_match_keywords)), all_content_arr))
                     for item in match_rows:
                         valid = [item]
                         file_extract(valid)
@@ -380,7 +397,8 @@ def read_pdf(file, all_customer):
             filter(lambda x: x.plate_number == temp_customer.plate_number, all_customer))
     # 匹配证件号
     if not match_customer and temp_customer.id_number:
-        match_customer = list(filter(lambda x: x.id_number == temp_customer.id_number, all_customer))
+        match_customer = list(
+            filter(lambda x: x.id_number == temp_customer.id_number, all_customer))
     customer = Customer()
     print(temp_customer.id_number, temp_customer.insurant, temp_customer.plate_number,
           temp_customer.insured_amount, temp_customer.insurance_categories)
@@ -423,7 +441,8 @@ def read_pdf(file, all_customer):
             all_customer.append(customer)
     successful = customer.not_empty()
     if not description:
-        description = '%s/%s' % (customer.description(), temp_customer.insurance_categories)
+        description = '%s/%s' % (customer.description(),
+                                 temp_customer.insurance_categories)
     return (all_customer, successful, description)
 
 

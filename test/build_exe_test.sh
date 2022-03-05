@@ -1,3 +1,4 @@
 #/bin/bash
 # oonly windows run
-python setup.py py2exe
+#python setup.py py2exe
+pyinstaller test.spec
